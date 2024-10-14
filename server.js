@@ -59,8 +59,31 @@ app.post('/api/user/:userId/sessions', async(req,res)=>{
 })
 
 // Fetching the data from DB 
-app.get("/api/leaderboard", async(req, res)=>{
-    
-})
+app.get("/api/leaderboard", async (req, res) => {
+    try {
+        const leaderboard = await User.aggregate([
+            { $unwind: '$session' }, // Unwind sessions array
+            {
+                $group: {
+                    _id:{
+                        userName: "$userName", 
+                        language: "$session.language",
+                    },
+                    totalCodingTime: { $sum: "$session.timeSpent" }
+                }
+            },
+            {
+                $sort: { totalCodingTime: -1 }
+            },
+            {
+                $limit: 50 // Limit to top 50 users
+            }
+        ]);
+
+        res.status(200).json(leaderboard);
+    } catch (error) {
+        res.status(400).json({ msg: "Error while fetching leaderboard", error });
+    }
+});
 
 app.listen(PORT, ()=>console.log(`Server is running on the PORT: ${PORT}`));

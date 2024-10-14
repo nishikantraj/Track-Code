@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
     email: {type:String, required: true, uniqe:true},
     session: [{
         language: String,
-        timeStamp: Number,
+        timeSpent: Number,
         date: {type: Date, default: Date.now}
     }]
 });
